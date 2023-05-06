@@ -6,7 +6,6 @@ object Users : Table() {
     val name = varchar("name", 16)
     val pass = varchar("password", 255)
     val uuid = varchar("uuid", 36)
-    val restrictions = varchar("restrictions", 1000).nullable()
     val preferences = varchar("preferences", 1000).nullable()
     val recipes = varchar("recipes", 1000).nullable()
 }
