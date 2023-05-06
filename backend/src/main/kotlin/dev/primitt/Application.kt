@@ -1,15 +1,11 @@
 package dev.primitt
 
-import com.expediagroup.graphql.client.spring.GraphQLWebClient
 import dev.primitt.plugins.*
 import io.ktor.server.application.*
-import kotlinx.coroutines.runBlocking
-    import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.net.HttpURLConnection
 import java.net.URI
-import java.net.URL
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
