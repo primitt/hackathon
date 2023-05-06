@@ -1,7 +1,9 @@
 package dev.primitt
 
+import com.expediagroup.graphql.client.spring.GraphQLWebClient
 import io.ktor.server.application.*
 import dev.primitt.plugins.*
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -16,8 +18,15 @@ fun Application.module() {
         "ep-ancient-credit-653271.us-east-2.aws.neon.tech/neondb",
         user = "26mittrapriansh0",
         password = "TFA7MZJN0pSL",
-        driver = "org.postgresql.Driver")
+        driver = "org.postgresql.Driver"
+    )
     transaction {
         SchemaUtils.create(Users)
+    }
+    val client = GraphQLWebClient(url = "https://production.suggestic.com/graphql")
+    runBlocking {
+        val helloWorldQuery = HelloWorldQuery()
+        val result = client.execute(helloWorldQuery)
+        println("hello world query result: ${result.data?.helloWorld}")
     }
 }
