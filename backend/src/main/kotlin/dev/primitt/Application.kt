@@ -26,15 +26,15 @@ fun Application.module() {
         driver = "org.postgresql.Driver"
     )
     transaction {
-        SchemaUtils.create(Users)
+        SchemaUtils.create(Users, Sessions)
     }
 }
-fun complexSearch(query: String, diet: String, intolerances: String){
+
+fun complexSearch(query: String, diet: String, intolerances: String) {
     val client = HttpClient.newBuilder().build();
     val request = HttpRequest.newBuilder()
         .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=5a5bb29a98ef4762917c9e17af5553f2&query=$query&diet=$diet&intolerances=$intolerances"))
         .build()
 
     val response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
 }
