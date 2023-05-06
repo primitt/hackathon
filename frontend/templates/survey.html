@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html data-theme="synthwave">
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.6/dist/full.css" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            .typing::after {
+                content: '|';
+                animation: blink 1s infinite;
+                margin-left: 3px;
+                display: inline-block;
+            }
+
+            @keyframes blink {
+                50% {
+                    opacity: 0;
+                }
+            }
+
+            .gold-text {
+                color: #FFD700;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+            }
+        </style>
+        <title>Survey</title>
+    </head>
+
+    <body class="min-h-screen">
+        <div class="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-purple-400 via-purple-600 to-blue-900">
+<h1 class="text-4xl font-bold mb-4" style="color: #000000;">Thanks for signing up! We just need to know a bit about you…</h1>
+
+            <div class="w-full sm:w-2/3 md:w-1/2 lg:w-1/3">
+                <form>
+<div class="card shadow-lg p-8 bg-gradient-to-br from-purple-600 via-purple-800 to-blue-900">
+
+                        <label class="label">
+                            <span class="label-text">Allergies</span>
+                        </label>
+                        <div class="space-y-2">
+                            <!-- Add other allergies with similar structure -->
+                            <div class="flex items-center">
+                                <input type="checkbox" id="allergy1" name="allergy1" class="checkbox">
+                                <label for="allergy1" class="label ml-2">Peanuts</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="allergy2" name="allergy2" class="checkbox">
+                                <label for="allergy2" class="label ml-2">Tree Nuts</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="allergy3" name="allergy3" class="checkbox">
+                                <label for="allergy3" class="label ml-2">Dairy</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="allergy4" name="allergy4" class="checkbox">
+                                <label for="allergy4" class="label ml-2">Eggs</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="allergy5" name="allergy5" class="checkbox">
+                                <label for="allergy5" class="label ml-2">Wheat</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="allergy6" name="allergy6" class="checkbox">
+                                <label for="allergy6" class="label ml-2">Soy</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="allergy7" name="allergy7" class="checkbox">
+                                                              <label for="allergy7" class="label ml-2">Fish</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="allergy8" name="allergy8" class="checkbox">
+                                <label for="allergy8" class="label ml-2">Shellfish</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="other" name="other" class="checkbox" onclick="showOtherTextbox()">
+                                <label for="other" class="label ml-2">Other</label>
+                                <input type="text" id="otherAllergies" name="otherAllergies" class="input input-bordered hidden ml-2" placeholder="Specify allergies separated by commas">
+                            </div>
+                        </div>
+                        <label class="label mt-4">
+                            <span class="label-text">Diet</span>
+                        </label>
+                        <select class="select select-bordered w-full">
+                            <option>Select your diet</option>
+                            <option>Vegetarian</option>
+                            <option>Vegan</option>
+                            <option>Pescatarian</option>
+                            <option>Gluten-Free</option>
+                            <option>Keto</option>
+                            <option>Paleo</option>
+                            <option>Low-FODMAP</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-outline btn-success mt-4 w-full" style="margin-bottom: 25px;">Submit</button>
+
+
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function showOtherTextbox() {
+                const otherAllergies = document.getElementById('otherAllergies');
+                otherAllergies.classList.toggle('hidden');
+            }
+        </script>
+    </body>
+</html>
+
