@@ -9,5 +9,9 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText("Hello World!")
         }
+
+        post("/api/{args}") {
+            val args = call.parameters["args"]
+        }
     }
 }
