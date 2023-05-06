@@ -34,3 +34,12 @@ fun complexSearch(query: String, diet: String, intolerances: String) {
 
     val response = client.send(request, HttpResponse.BodyHandlers.ofString());
 }
+
+fun getIngredientInfo (id: Int) {
+    val client = HttpClient.newBuilder().build();
+    val request = HttpRequest.newBuilder()
+        .uri(URI.create("https://api.spoonacular.com/recipes/$id/information?apiKey=5a5bb29a98ef4762917c9e17af5553f2"))
+        .build()
+
+    val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+}
