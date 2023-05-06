@@ -1,12 +1,15 @@
 package dev.primitt
 
 import com.expediagroup.graphql.client.spring.GraphQLWebClient
-import io.ktor.server.application.*
 import dev.primitt.plugins.*
+import io.ktor.server.application.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.net.HttpURLConnection
+import java.net.URL
+
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
@@ -27,4 +30,5 @@ fun Application.module() {
         val result = client.execute(helloWorldQuery)
         println("hello world query result: ${result.data?.helloWorld}")
     }
+
 }
