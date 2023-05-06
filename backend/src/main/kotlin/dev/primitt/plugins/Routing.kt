@@ -75,9 +75,29 @@ fun Application.configureRouting() {
                                 it[sessionId] = generatedSessionId
                                 it[uuid] = generatedUuid
                             }
-                            runBlocking { call.respond(gson.toJson(RegisterResponse(true, generatedSessionId, generatedUuid))) }
+                            runBlocking {
+                                call.respond(
+                                    gson.toJson(
+                                        RegisterResponse(
+                                            "true",
+                                            generatedSessionId,
+                                            generatedUuid
+                                        )
+                                    )
+                                )
+                            }
                         } else {
-                            runBlocking { call.respond(gson.toJson(RegisterResponse(false, "", ""))) }
+                            runBlocking {
+                                call.respond(
+                                    gson.toJson(
+                                        RegisterResponse(
+                                            "false",
+                                            "",
+                                            ""
+                                        )
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -86,18 +106,29 @@ fun Application.configureRouting() {
                     transaction {
                         val receive = runBlocking { call.receive<String>() }
                         val sessionInput = gson.fromJson(receive, SessionInput::class.java)
-                        val sessions = transaction { Sessions.select(Sessions.sessionId eq sessionInput.sessionId) }
+                        val sessions = Sessions.select(Sessions.sessionId eq sessionInput.sessionId)
                         if (sessions.count().toInt() == 0) {
-                            runBlocking { call.respond(gson.toJson(SessionResponse("", false, "Invalid session ID"))) }
+                            runBlocking {
+                                call.respond(
+                                    gson.toJson(
+                                        SessionResponse(
+                                            "",
+                                            "false",
+                                            "Invalid session ID"
+                                        )
+                                    )
+                                )
+                            }
                         } else {
                             val user = Users.select(Users.uuid eq sessions.first()[Sessions.uuid]).first()
                             runBlocking {
                                 call.respond(
-                                    gson.toJson(SessionResponse(
-                                        user[Users.name],
-                                        true,
-                                        ""
-                                    )
+                                    gson.toJson(
+                                        SessionResponse(
+                                            user[Users.name],
+                                            "true",
+                                            ""
+                                        )
                                     )
                                 )
                             }
