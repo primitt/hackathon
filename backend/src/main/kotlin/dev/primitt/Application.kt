@@ -26,20 +26,20 @@ fun Application.module() {
     }
 }
 
-fun complexSearch(query: String, diet: String, intolerances: String) {
+fun complexSearch(query: String, diet: String, intolerances: String): String {
     val client = HttpClient.newBuilder().build();
     val request = HttpRequest.newBuilder()
         .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=5a5bb29a98ef4762917c9e17af5553f2&query=$query&diet=$diet&intolerances=$intolerances"))
         .build()
 
-    val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    return client.send(request, HttpResponse.BodyHandlers.ofString()).body()
 }
 
-fun getIngredientInfo (id: Int) {
+fun getIngredientInfo(id: Int): String {
     val client = HttpClient.newBuilder().build();
     val request = HttpRequest.newBuilder()
         .uri(URI.create("https://api.spoonacular.com/recipes/$id/information?apiKey=5a5bb29a98ef4762917c9e17af5553f2"))
         .build()
 
-    val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    return client.send(request, HttpResponse.BodyHandlers.ofString()).body()
 }
