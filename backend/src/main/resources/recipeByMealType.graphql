@@ -1,0 +1,21 @@
+type Query {
+    id: ID!
+    name: String
+    description: String
+    location: String
+    mealTags: String
+    meal
+    recipesByMealTime(mealTime: BREAKFAST, dietaryTags: [GLUTEN_FREE]) {
+    edges {
+        node {
+            name
+            author
+            ingredients {
+                name
+            }
+            instructions
+            ingredientLines
+        }
+    }
+}
+}
