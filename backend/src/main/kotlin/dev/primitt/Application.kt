@@ -13,9 +13,7 @@ fun main(args: Array<String>): Unit =
 fun Application.module() {
     configureRouting()
     Database.connect(
-        "ep-ancient-credit-653271.us-east-2.aws.neon.tech/neondb",
-        user = "26mittrapriansh0",
-        password = "TFA7MZJN0pSL",
+        "jdbc:postgresql://ep-ancient-credit-653271.us-east-2.aws.neon.tech/neondb?user=26mittrapriansh&password=TFA7MZJN0pSL",
         driver = "org.postgresql.Driver")
     transaction {
         SchemaUtils.create(Users)

@@ -16,6 +16,9 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <main.class>io.ktor.server.netty.EngineMain</main.class>
         <graphql-kotlin.version>6.0.0</graphql-kotlin.version>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <repositories>
     </repositories>
@@ -73,12 +76,14 @@
             <artifactId>exposed-jdbc</artifactId>
             <version>0.40.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.6.0</version>
-            <scope>compile</scope>
+            <scope>runtime</scope>
         </dependency>
+
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
