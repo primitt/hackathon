@@ -26,10 +26,19 @@ fun Application.module() {
     }
 }
 
-fun complexSearch(query: String, diet: String, intolerances: String): String {
+fun search(query: String, inputDiets: Array<String>, inputIntolerances: Array<String>): String {
+    var diets = ""
+    var intolerances = ""
+    for (diet in inputDiets) {
+        diets = "$diets,$diet"
+    }
+    for (intolerance in inputIntolerances) {
+        intolerances = "$intolerances,$intolerance"
+    }
+
     val client = HttpClient.newBuilder().build();
     val request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=5a5bb29a98ef4762917c9e17af5553f2&query=$query&diet=$diet&intolerances=$intolerances"))
+        .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=5a5bb29a98ef4762917c9e17af5553f2&query=$query&diet=$diets&intolerances=$intolerances"))
         .build()
 
     return client.send(request, HttpResponse.BodyHandlers.ofString()).body()
