@@ -19,12 +19,6 @@ fun Application.module() {
         driver = "org.postgresql.Driver"
     )
     transaction {
-        SchemaUtils.create(Users)
-    }
-    val client = GraphQLWebClient(url = "https://production.suggestic.com/graphql")
-    runBlocking {
-        val helloWorldQuery = HelloWorldQuery()
-        val result = client.execute(helloWorldQuery)
-        println("hello world query result: ${result.data?.helloWorld}")
+        SchemaUtils.create(Users, Sessions)
     }
 }
