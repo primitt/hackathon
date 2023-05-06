@@ -2,10 +2,7 @@ package dev.primitt.plugins
 
 import dev.primitt.Sessions
 import dev.primitt.Users
-import dev.primitt.dto.RegisterResponse
-import dev.primitt.dto.SessionInput
-import dev.primitt.dto.SessionResponse
-import dev.primitt.dto.User
+import dev.primitt.dto.*
 import dev.primitt.gson
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -137,7 +134,39 @@ fun Application.configureRouting() {
                 }
 
                 "login" -> {
+                    val received = call.receive<String>()
+                    val receivedObject = gson.fromJson(received, LoginInput::class.java)
 
+                    val loginUser = Users.select { Users.name eq receivedObject.username }.first()
+                    transaction {
+                        if (loginUser[Users.pass] == receivedObject.password) {
+                            val uuid = loginUser[Users.uuid]
+                            val sessionId = Sessions.select { Sessions.uuid eq uuid }.first()[Sessions.sessionId]
+                            runBlocking {
+                                call.respond(
+                                    gson.toJson(
+                                        LoginResponse(
+                                            "true",
+                                            sessionId,
+                                            uuid
+                                        )
+                                    )
+                                )
+                            }
+                        } else {
+                            runBlocking {
+                                call.respond(
+                                    gson.toJson(
+                                        LoginResponse(
+                                            "false",
+                                            "",
+                                            ""
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
