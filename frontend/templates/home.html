@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html data-theme="synthwave">
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.6/dist/full.css" rel="stylesheet" type="text/css" />
+  <title>Home</title>
+  <style>
+    body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 40px;
+      background: linear-gradient(to right, #3CB371 0%, #2E8B57 100%);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .rounded-rectangle {
+      position: relative;
+      display: inline-block;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      margin-top: 20px;
+      padding: 20px;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .rounded-rectangle img {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    .rounded-rectangle p {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+    }
+  </style>
+  <script>
+  function findMeals(event) {
+    event.preventDefault();
+
+    // get input values
+    var prepTime = document.getElementById("prep-time").value;
+    var desiredMeal = document.getElementById("desired-meal").value;
+
+    // create container for rounded rectangles
+    var container = document.getElementById("container");
+
+    // clear any existing content in the container
+    container.innerHTML = "";
+
+    // create 9 rounded rectangles
+    for (var i = 0; i < 9; i++) {
+      // create rounded rectangle
+      var roundedRectangle = document.createElement("div");
+      roundedRectangle.className = "rounded-rectangle";
+      roundedRectangle.style.backgroundColor = "#1f1f1f";
+
+      // create image element
+      var img = document.createElement("img");
+      img.src = "https://spoonacular.com/recipeImages/654905-312x231.jpg";
+      roundedRectangle.appendChild(img);
+
+      // create subtitle element
+      var subtitle = document.createElement("p");
+      subtitle.innerHTML = "Pasta With Chickpeas and Kale";
+      roundedRectangle.appendChild(subtitle);
+
+      // add rounded rectangle to container
+      container.appendChild(roundedRectangle);
+    }
+  }
+
+  </script>
+</head>
+<body>
+  <h1>MyMeals</h1>
+  <main class="container mx-auto my-10">
+    <div class="w-full flex justify-center">
+      <form class="card bordered" onsubmit="findMeals(event)">
+        <div class="card-body space-y-4">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Prep Time</span>
+            </label>
+            <input type="text" placeholder="Enter prep time" class="input input-bordered" id="prep-time">
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Desired Meal</span>
+            </label>
+            <input type="text" placeholder="Enter desired meal" class="input input-bordered" id="desired-meal">
+          </div>
+          <button type="submit" class="btn btn-primary">Find Meals</button>
+        </div>
+      </form>
+    </div>
+    <div id="container"></div>
+  </main>
+</body>
+</html>
