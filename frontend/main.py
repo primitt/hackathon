@@ -1,17 +1,49 @@
 from flask import Flask, request, render_template, redirect, make_response, url_for
 import requests
 import os
+import json
 import sys
 import hashlib 
 
 app = Flask(__name__)
-url = "https://1ccb-2a09-bac1-76c0-c98-00-26b-72.ngrok-free.app"
+url = "https://2e55-2a09-bac1-76a0-c98-00-26b-94.ngrok-free.app/"
+def sessionReq(session, uuid):
+    rqq = requests.post(url=url + "/api/session", json={
+        "uuid":uuid,
+        "sessionId":session
+    })
+    txt = json.loads(rqq.text)
+    if txt["success"] == "true":
+        return True
+    else:
+        return False
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
+    if request.method == "POST":
+        if sessionReq(request.cookies.get("sessionID"), request.cookies.get("uuid")):
+            return render_template("home.html")
+        else:
+            bdy = request.form
+            print(bdy)
+            rqq = requests.post(url=url + "/api/login", json={
+            "username":bdy["username"],
+            "password":hashlib.sha1(bdy["password"].encode()).hexdigest()
+        })
+        txt = json.loads(rqq.text)
+        if txt["success"] == "true":
+            resp = make_response(redirect(url_for("home")))
+            resp.set_cookie("uuid", txt["uuid"])
+            resp.set_cookie("sessionID", txt["sessionId"])
+        else:
+            return render_template("login.html", message="Your credentials are incorrect, please try again. ")
+    else:
+        if sessionReq(request.cookies.get("sessionID"), request.cookies.get("uuid")):
+            return redirect(url_for("home"))
+        else:
+            return render_template("login.html")
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "GET":
@@ -26,10 +58,11 @@ def signup():
                         "username":form["username"],
                         "password":hashlib.sha1(form["password"].encode()).hexdigest()
                     })
-                    if rqp.text["success"] == "true":
-                        resp = make_response(redirect(url_for(survey())))
-                        resp.set_cookie("uuid", rqp.text["uuid"])
-                        resp.set_cookie("sessionID", rqp.text["sessionId"])
+                    txt = json.loads(rqp.text)
+                    if txt["success"] == "true":
+                        resp = make_response(redirect(url_for("survey")))
+                        resp.set_cookie("uuid", txt["uuid"])
+                        resp.set_cookie("sessionID", txt["sessionId"])
                         return resp
                     else:
                         return render_template("signup.html", message="Unable to sign up, try again") 
@@ -39,8 +72,87 @@ def signup():
                 return render_template("signup.html", message="Password must be less than")
         else:
             return render_template("signup.html", message="Passwords must equal each other")
-@app.run("/survey")
+@app.route("/survey", methods=["GET", "POST"])
 def survey():
-    return render_template("survey.html")
+    if request.method == "POST":
+        allergy_array = []
+        txt = request.form
+        try:
+            if txt["Peanuts"]:
+                allergy_array.append("Peanuts")
+        except:
+            pass
+        try:
+            if txt["Tree Nuts"]:
+                allergy_array.append("Tree Nuts")
+        except:
+            pass
+        try:
+            if txt["Dairy"]:
+                allergy_array.append("Dairy")
+        except:
+            pass
+        try:
+            if txt["Eggs"]:
+                allergy_array.append("Eggs")
+        except:
+            pass
+        try:
+            if txt["Wheat"]:
+                allergy_array.append("Wheat")
+        except:
+            pass
+        try:
+            if txt["Soy"]:
+                allergy_array.append("Soy")
+        except:
+            pass
+        try:
+            if txt["Fish"]:
+                allergy_array.append("Fish")
+        except:
+            pass
+        try:
+            if txt["Shellfish"]:
+                allergy_array.append("Shellfish")
+        except:
+            pass
+        try:
+            if txt["other"]:
+                otherssplit = txt["otherAllergies"].split(",")
+                for values in otherssplit:
+                    allergy_array.append(values)
+        except:
+            pass
+        try:
+            if txt["diet"]:
+                diet = txt["diet"]
+                if diet == "Select your diet": 
+                    diet = ""
+            else:
+                diet = ""
+        except:
+            pass
+        rqp = requests.post(url=url + "/api/survey", json={
+            "allergies":allergy_array,
+            "diet":diet,
+            "uuid":request.cookies.get("uuid")
+        })
+        print(rqp.text)
+        if rqp.text == "success":
+            return redirect("home")
+        else: 
+            return redirect("index")
+    if request.method == "GET":
+        if sessionReq(request.cookies.get("sessionID"), request.cookies.get("uuid")):
+            return render_template("survey.html")
+        else:
+            return redirect(url_for("login"))
+@app.route("/home")
+def home():
+    if sessionReq(request.cookies.get("sessionID"), request.cookies.get("uuid")):
+        return render_template("home.html")
+    else:
+        return redirect(url_for("login"))
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="127.0.0.1")
