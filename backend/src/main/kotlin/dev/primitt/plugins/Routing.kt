@@ -2,6 +2,7 @@ package dev.primitt.plugins
 
 import dev.primitt.Sessions
 import dev.primitt.Users
+import dev.primitt.complexSearch
 import dev.primitt.dto.*
 import dev.primitt.gson
 import io.ktor.server.application.*
@@ -16,6 +17,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.util.*
 
 
@@ -28,15 +30,12 @@ fun Application.configureRouting() {
 
         post("/api/{args}") {
             val args = call.parameters["args"]
+            val received = call.receive<String>()
             when (args) {
                 "register" -> {
                     transaction {
-                        lateinit var string: String
-                        runBlocking {
-                            string = call.receive<String>()
-                        }
-                        println(string)
-                        val user = gson.fromJson(string, User::class.java)
+                        println(received)
+                        val user = gson.fromJson(received, User::class.java)
                         val users = Users.select(Users.name eq user.username)
                         if (users.count().toInt() == 0) {
 
@@ -82,6 +81,7 @@ fun Application.configureRouting() {
                                         )
                                     )
                                 )
+                                println("Register, user created")
                             }
                         } else {
                             runBlocking {
@@ -94,6 +94,7 @@ fun Application.configureRouting() {
                                         )
                                     )
                                 )
+                                println("Register, user already exists")
                             }
                         }
                     }
@@ -101,8 +102,7 @@ fun Application.configureRouting() {
 
                 "session" -> {
                     transaction {
-                        val receive = runBlocking { call.receive<String>() }
-                        val sessionInput = gson.fromJson(receive, SessionInput::class.java)
+                        val sessionInput = gson.fromJson(received, SessionInput::class.java)
                         val sessions = Sessions.select(Sessions.sessionId eq sessionInput.sessionId)
                         if (sessions.count().toInt() == 0) {
                             runBlocking {
@@ -115,6 +115,7 @@ fun Application.configureRouting() {
                                         )
                                     )
                                 )
+                                println("Invalid session ID")
                             }
                         } else {
                             val user = Users.select(Users.uuid eq sessions.first()[Sessions.uuid]).first()
@@ -128,17 +129,32 @@ fun Application.configureRouting() {
                                         )
                                     )
                                 )
+                                println("Valid session ID, response sent")
                             }
                         }
                     }
                 }
 
                 "login" -> {
-                    val received = call.receive<String>()
                     val receivedObject = gson.fromJson(received, LoginInput::class.java)
 
-                    val loginUser = Users.select { Users.name eq receivedObject.username }.first()
                     transaction {
+                        val loginUser = Users.select { Users.name eq receivedObject.username }.firstOrNull()
+                        if (loginUser == null) {
+                            runBlocking {
+                                call.respond(
+                                    gson.toJson(
+                                        LoginResponse(
+                                            "false",
+                                            "",
+                                            ""
+                                        )
+                                    )
+                                )
+                                println("Login failed")
+                            }
+                            return@transaction
+                        }
                         if (loginUser[Users.pass] == receivedObject.password) {
                             val uuid = loginUser[Users.uuid]
                             val sessionId = Sessions.select { Sessions.uuid eq uuid }.first()[Sessions.sessionId]
@@ -152,6 +168,8 @@ fun Application.configureRouting() {
                                         )
                                     )
                                 )
+
+                                println("Login successful")
                             }
                         } else {
                             runBlocking {
@@ -164,10 +182,32 @@ fun Application.configureRouting() {
                                         )
                                     )
                                 )
+                                println("Login failed")
                             }
                         }
                     }
                 }
+
+                "survey" -> {
+                    val receivedObject = gson.fromJson(received, PreferenceInput::class.java)
+
+                    transaction {
+                        val affected = Users.update({ Users.uuid eq receivedObject.uuid }) {
+                            it[preferences] = gson.toJson(receivedObject.toServerPreference())
+                        }
+
+                        if (affected == 1) {
+                            runBlocking { call.respond("success") }
+                        } else {
+                            runBlocking { call.respond("failure, no users updated") }
+                        }
+                    }
+                }
+            }
+
+            if (args!!.contains("search")) {
+                val searchItem = args.split("/")[1]
+                complexSearch()
             }
         }
     }
