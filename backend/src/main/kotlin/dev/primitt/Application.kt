@@ -1,5 +1,6 @@
 package dev.primitt
 
+import org.json.JSONObject
 import dev.primitt.plugins.*
 import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.Database
@@ -35,7 +36,7 @@ fun getIngredientInfo(id: Int): String {
     return client.send(request, HttpResponse.BodyHandlers.ofString()).body()
 
 }
-
+var searchResults = ""
 fun search(query: String, inputDiets: Array<String>, inputIntolerances: Array<String>, prepTime: Int): String {
     var diets = ""
     var intolerances = ""
@@ -51,5 +52,19 @@ fun search(query: String, inputDiets: Array<String>, inputIntolerances: Array<St
         .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=5a5bb29a98ef4762917c9e17af5553f2&query=$query&diet=$diets&intolerances=$intolerances&maxReadyTime=$prepTime"))
         .build()
 
-    return client.send(request, HttpResponse.BodyHandlers.ofString()).body()
+
+    searchResults = client.send(request, HttpResponse.BodyHandlers.ofString()).body()
+    return searchResults
+}
+fun getIdFromImage(url:String): Int {
+    val json = JSONObject(searchResults)
+    var results = json.getJSONArray("results")
+    var id = 0
+    for (result in results) {
+        var resultJSONObject = JSONObject(result)
+        if (resultJSONObject.getString("image").equals(url)) {
+            id = resultJSONObject.getInt("id")
+        }
+    }
+    return id
 }
