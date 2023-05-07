@@ -17,10 +17,10 @@
                     <h1 class="text-3xl">
                         Login
                     </h1>
-                    <form>
-                        <input type="username" placeholder="Username" class="input input-bordered input-primary w-full max-w-xs" style="margin-bottom: 10px" />
+                    <form action="/login" method="POST">
+                        <input type="username" placeholder="Username" name="username" class="input input-bordered input-primary w-full max-w-xs" style="margin-bottom: 10px" />
                         <br>
-                        <input type="password" placeholder="Password" class="input input-bordered input-primary w-full max-w-xs" style="margin-bottom: 10px" />
+                        <input type="password" placeholder="Password" name="password" class="input input-bordered input-primary w-full max-w-xs" style="margin-bottom: 10px" />
                         <br>
                         <button type="submit" class="btn btn-primary btn-active w-full max-w-xs">Login</button>
                     </form>
