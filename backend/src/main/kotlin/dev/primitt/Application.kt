@@ -26,7 +26,17 @@ fun Application.module() {
     }
 }
 
-fun search(query: String, inputDiets: Array<String>, inputIntolerances: Array<String>): String {
+fun getIngredientInfo(id: Int): String {
+    val client = HttpClient.newBuilder().build();
+    val request = HttpRequest.newBuilder()
+        .uri(URI.create("https://api.spoonacular.com/recipes/$id/information?apiKey=5a5bb29a98ef4762917c9e17af5553f2"))
+        .build()
+
+    return client.send(request, HttpResponse.BodyHandlers.ofString()).body()
+
+}
+
+fun search(query: String, inputDiets: Array<String>, inputIntolerances: Array<String>, prepTime: Int): String {
     var diets = ""
     var intolerances = ""
     for (diet in inputDiets) {
@@ -38,16 +48,7 @@ fun search(query: String, inputDiets: Array<String>, inputIntolerances: Array<St
 
     val client = HttpClient.newBuilder().build();
     val request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=5a5bb29a98ef4762917c9e17af5553f2&query=$query&diet=$diets&intolerances=$intolerances"))
-        .build()
-
-    return client.send(request, HttpResponse.BodyHandlers.ofString()).body()
-}
-
-fun getIngredientInfo(id: Int): String {
-    val client = HttpClient.newBuilder().build();
-    val request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.spoonacular.com/recipes/$id/information?apiKey=5a5bb29a98ef4762917c9e17af5553f2"))
+        .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=5a5bb29a98ef4762917c9e17af5553f2&query=$query&diet=$diets&intolerances=$intolerances&maxReadyTime=$prepTime"))
         .build()
 
     return client.send(request, HttpResponse.BodyHandlers.ofString()).body()

@@ -2,7 +2,6 @@ package dev.primitt.plugins
 
 import dev.primitt.Sessions
 import dev.primitt.Users
-import dev.primitt.complexSearch
 import dev.primitt.dto.*
 import dev.primitt.gson
 import io.ktor.server.application.*
@@ -102,7 +101,8 @@ fun Application.configureRouting() {
 
                 "session" -> {
                     transaction {
-                        val sessionInput = gson.fromJson(received, SessionInput::class.java)
+                        val receive = runBlocking { call.receive<String>() }
+                        val sessionInput = gson.fromJson(receive, SessionInput::class.java)
                         val sessions = Sessions.select(Sessions.sessionId eq sessionInput.sessionId)
                         if (sessions.count().toInt() == 0) {
                             runBlocking {
@@ -203,11 +203,8 @@ fun Application.configureRouting() {
                         }
                     }
                 }
-            }
 
-            if (args!!.contains("search")) {
-                val searchItem = args.split("/")[1]
-                complexSearch()
+                ""
             }
         }
     }
