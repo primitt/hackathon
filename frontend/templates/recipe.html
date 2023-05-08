@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html data-theme="synthwave">
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.6/dist/full.css" rel="stylesheet" type="text/css" />
+        <style>
+            .gradient-text {
+                background: linear-gradient(to right, #3CB371 0%, #2E8B57 100%);
+                -webkit-background-clip: text;
+                color: transparent;
+            }
+        </style>
+        <title>Ingredients</title>
+    </head>
+    <header>
+    </header>
+
+    <body class="h-screen">
+        <div class="h-full flex flex-col justify-center items-center bg-gradient-to-br from-purple-400 via-purple-600 to-blue-900">
+            <h1 class="text-8xl font-bold gradient-text mb-10">MyMeals</h1>
+            <div class="container mx-auto my-10">
+                <h2 class="text-4xl font-bold text-white mb-5">{{title}}</h2>
+                <div class="card bordered">
+                    <div class="card-body space-y-4">
+                        <h3 class="text-6xl font-bold">Ingredients</h3>
+                        <ul class="text-xl list-disc list-inside">
+                            {% for ingredient in ingredients %}
+                            <li>{{ ingredient }}</li>
+                            {% endfor %}
+                        </ul>
+                        <h3 class="text-xl font-bold">Instructions</h3>
+                        <ol class="list-decimal list-inside">
+                            {{intruction | safe}}
+                        </ol>
+                        <div class="text-base">
+                            <p><strong>Cook time:</strong> {rn} minutes</p>
+                            <p><strong>Nutritional information:</strong> {{summary | safe}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

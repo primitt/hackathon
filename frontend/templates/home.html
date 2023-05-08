@@ -82,30 +82,59 @@
   }
 
   </script>
+  <style>
+    .rounded-rectangle {
+      background-color: #1f1f1f;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px;
+      display: inline-block;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    p {
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
   <h1>MyMeals</h1>
   <main class="container mx-auto my-10">
     <div class="w-full flex justify-center">
-      <form class="card bordered" onsubmit="findMeals(event)">
+      <form action="/home" method="POST" class="card bordered">
         <div class="card-body space-y-4">
           <div class="form-control">
             <label class="label">
               <span class="label-text">Prep Time</span>
             </label>
-            <input type="text" placeholder="Enter prep time" class="input input-bordered" id="prep-time">
+            <input type="text" placeholder="Enter prep time" class="input input-bordered" name="prep-time">
           </div>
           <div class="form-control">
             <label class="label">
               <span class="label-text">Desired Meal</span>
             </label>
-            <input type="text" placeholder="Enter desired meal" class="input input-bordered" id="desired-meal">
+            <input type="text" placeholder="Enter desired meal" class="input input-bordered" name="desired-meal">
           </div>
           <button type="submit" class="btn btn-primary">Find Meals</button>
         </div>
       </form>
     </div>
-    <div id="container"></div>
+    <div id="container">
+        {% for meal in results %}
+            <div id="container">
+              <div class="rounded-rectangle">
+                <img src="{{meal['image']}}" alt="image" />
+                <a href="/recipie/{{meal['id']}}">{{meal["title"]}}</a>
+              </div>
+              <!-- Add more divs with the "rounded-rectangle" class to display more results -->
+            </div>
+        {% endfor %}
+    </div>
   </main>
 </body>
 </html>

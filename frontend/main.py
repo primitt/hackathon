@@ -6,7 +6,7 @@ import sys
 import hashlib 
 
 app = Flask(__name__)
-url = "https://2e55-2a09-bac1-76a0-c98-00-26b-94.ngrok-free.app/"
+url = "https://263f-2a09-bac1-76a0-c98-00-26b-94.ngrok-free.app/"
 def sessionReq(session, uuid):
     rqq = requests.post(url=url + "/api/session", json={
         "uuid":uuid,
@@ -84,7 +84,7 @@ def survey():
             pass
         try:
             if txt["Tree Nuts"]:
-                allergy_array.append("Tree Nuts")
+                allergy_array.append("TreeNuts")
         except:
             pass
         try:
@@ -148,11 +148,38 @@ def survey():
             return render_template("survey.html")
         else:
             return redirect(url_for("login"))
-@app.route("/home")
+@app.route("/home", methods=["GET", "POST"])
 def home():
-    if sessionReq(request.cookies.get("sessionID"), request.cookies.get("uuid")):
-        return render_template("home.html")
+    if request.method == "GET":
+        if sessionReq(request.cookies.get("sessionID"), request.cookies.get("uuid")):
+            return render_template("home.html")
+        else:
+            return redirect(url_for("login"))
     else:
-        return redirect(url_for("login"))
+        if sessionReq(request.cookies.get("sessionID"), request.cookies.get("uuid")):
+            fr = request.form
+            rqs = requests.post(url = url + "/api/search", json={
+                "preptime":int(fr["prep-time"]),
+                "searchquery":fr["desired-meal"],
+                "uuid":request.cookies.get("uuid")
+            })
+            dumper = json.loads(rqs.text)
+            print(dumper["results"][0])
+            return render_template("home.html", results=dumper["results"])
+        else:
+            return redirect(url_for("login"))
+@app.route("/recipie/<id>", methods=["GET"])
+def recipie(id):
+    rqs = requests.post(url = url + "/api/recipe", json={
+        "id":int(id),
+    })
+    dumper = json.loads(rqs.text)
+    ingredients = []
+    for values in dumper["extendedIngredients"]:
+        ingredients.append(values["original"])
+    intruction = dumper["instructions"]
+    print(ingredients)
+    print(intruction)
+    return render_template("recipe.html", ingredients=ingredients, intruction=intruction, title=dumper["title"], rn=dumper["readyInMinutes"], summary=dumper["summary"] )
 if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1")
