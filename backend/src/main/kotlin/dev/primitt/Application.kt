@@ -1,8 +1,10 @@
 package dev.primitt
 
-import org.json.JSONObject
-import dev.primitt.plugins.*
+import com.apollographql.apollo3.ApolloClient
+import dev.primitt.graphql.queryLaunchList
+import dev.primitt.plugins.configureRouting
 import io.ktor.server.application.*
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -11,6 +13,9 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
+val apolloClient = ApolloClient.Builder()
+    .serverUrl("https://apollo-fullstack-tutorial.herokuapp.com/graphql")
+    .build()
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
@@ -25,46 +30,56 @@ fun Application.module() {
     transaction {
         SchemaUtils.create(Users, Sessions)
     }
-}
 
+    runBlocking {
+        println(queryLaunchList().data)
+    }
+}
+val key = "6e01572b168f4ecc81786cf761aa265a"
 fun getIngredientInfo(id: Int): String {
     val client = HttpClient.newBuilder().build();
     val request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.spoonacular.com/recipes/$id/information?apiKey=5a5bb29a98ef4762917c9e17af5553f2"))
+        .uri(URI.create("https://api.spoonacular.com/recipes/$id/information?apiKey=$key"))
         .build()
 
-    return client.send(request, HttpResponse.BodyHandlers.ofString()).body()
+    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
+    println(response.headers().firstValue("X-API-Quota-Used"))
+    return response.body()
 }
 var searchResults = ""
 fun search(query: String, inputDiets: Array<String>, inputIntolerances: Array<String>, prepTime: Int): String {
     var diets = ""
     var intolerances = ""
-    for (diet in inputDiets) {
-        diets = "$diets,$diet"
-    }
-    for (intolerance in inputIntolerances) {
-        intolerances = "$intolerances,$intolerance"
-    }
+
+    if (inputDiets.size > 1) {
+        for (diet in inputDiets) {
+            diets += if (inputDiets.size - 1 == inputDiets.indexOf(diet)) diet
+            else "$diet,"
+        }
+    } else diets = inputDiets[0]
+
+    if (inputIntolerances.size > 1) {
+        for (intolerance in inputIntolerances) {
+            intolerances += if (inputIntolerances.size - 1 == inputIntolerances.indexOf(intolerance)) intolerance
+            else "$intolerance,"
+        }
+    } else intolerances = inputIntolerances[0]
+
+    val validatedDiets = diets.replace(" ", "%20")
+    val validatedIntolerances = intolerances.replace(" ", "%20")
+    val validatedQuery = query.replace(" ", "%20")
+
+    println(validatedQuery)
+    println(validatedDiets)
+    println(validatedIntolerances)
+    println(prepTime)
 
     val client = HttpClient.newBuilder().build();
     val request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=5a5bb29a98ef4762917c9e17af5553f2&query=$query&diet=$diets&intolerances=$intolerances&maxReadyTime=$prepTime"))
+        .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?apiKey=$key&query=$validatedQuery&diet=$validatedDiets&intolerances=$validatedIntolerances&maxReadyTime=$prepTime"))
         .build()
-
-
-    searchResults = client.send(request, HttpResponse.BodyHandlers.ofString()).body()
-    return searchResults
-}
-fun getIdFromImage(url:String): Int {
-    val json = JSONObject(searchResults)
-    var results = json.getJSONArray("results")
-    var id = 0
-    for (result in results) {
-        var resultJSONObject = JSONObject(result)
-        if (resultJSONObject.getString("image").equals(url)) {
-            id = resultJSONObject.getInt("id")
-        }
-    }
-    return id
+    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+    println(response.headers().firstValue("X-API-Quota-Used"))
+    return response.body()
 }
