@@ -204,7 +204,7 @@ fun Application.configureRouting() {
                     }
                 }
 
-                ""
+
             }
         }
     }
