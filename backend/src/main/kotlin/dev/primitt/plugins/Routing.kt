@@ -1,16 +1,16 @@
 package dev.primitt.plugins
 
-import dev.primitt.Sessions
-import dev.primitt.Users
+import com.cjcrafter.openai.OpenAI
+import com.cjcrafter.openai.chat.ChatMessage
+import com.cjcrafter.openai.chat.ChatRequest
+import com.cjcrafter.openai.chat.ChatUser
+import dev.primitt.*
 import dev.primitt.dto.*
-import dev.primitt.gson
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
@@ -18,6 +18,12 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.util.*
+import java.util.List
+import kotlin.collections.ArrayList
+import kotlin.collections.MutableList
+import kotlin.collections.arrayListOf
+import kotlin.collections.first
+import kotlin.collections.firstOrNull
 
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -101,8 +107,7 @@ fun Application.configureRouting() {
 
                 "session" -> {
                     transaction {
-                        val receive = runBlocking { call.receive<String>() }
-                        val sessionInput = gson.fromJson(receive, SessionInput::class.java)
+                        val sessionInput = gson.fromJson(received, SessionInput::class.java)
                         val sessions = Sessions.select(Sessions.sessionId eq sessionInput.sessionId)
                         if (sessions.count().toInt() == 0) {
                             runBlocking {
@@ -204,7 +209,35 @@ fun Application.configureRouting() {
                     }
                 }
 
+                "search" -> {
+                    val receivedObject = gson.fromJson(received, SearchInput::class.java)
+                    transaction {
+                        val prefs = gson.fromJson(
+                            Users.select { Users.uuid eq receivedObject.uuid }.first()[Users.preferences],
+                            ServerPreference::class.java
+                        )
 
+                        runBlocking {
+                            call.respond(search(
+                                receivedObject.searchquery,
+                                arrayOf(prefs.diet),
+                                prefs.allergies,
+                                receivedObject.preptime
+                            ))
+                        }
+                    }
+                }
+
+                "recipe" -> {
+                    call.respond(getIngredientInfo(gson.fromJson(received, RecipeInfo::class.java).id))
+                }
+
+                "fyp" -> {
+                    val user = Users.select(Users.uuid eq received).first()
+                    val prefs = gson.fromJson(user[Users.preferences], ServerPreference::class.java)
+                    val recipes = arrayListOf<String>()
+                    getIngredientInfo(gson.fromJson(received, RecipeInfo::class.java).id)
+                }
             }
         }
     }
