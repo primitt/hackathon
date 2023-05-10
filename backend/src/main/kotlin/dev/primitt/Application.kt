@@ -4,6 +4,8 @@ import com.apollographql.apollo3.ApolloClient
 import dev.primitt.graphql.queryLaunchList
 import dev.primitt.plugins.configureRouting
 import io.ktor.server.application.*
+import io.ktor.server.freemarker.*
+import freemarker.cache.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -33,6 +35,9 @@ fun Application.module() {
 
     runBlocking {
         println(queryLaunchList().data)
+    }
+    install (FreeMarker){
+        templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")
     }
 }
 val key = "6e01572b168f4ecc81786cf761aa265a"

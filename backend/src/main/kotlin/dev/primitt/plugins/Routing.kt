@@ -23,6 +23,8 @@ import kotlin.collections.ArrayList
 import kotlin.collections.MutableList
 import kotlin.collections.arrayListOf
 import kotlin.collections.first
+import freemarker.cache.*
+import io.ktor.server.freemarker.*
 import kotlin.collections.firstOrNull
 
 
@@ -30,9 +32,8 @@ import kotlin.collections.firstOrNull
 fun Application.configureRouting() {
     routing {
         get("/") {
-            call.respondText("Hello World!")
+            call.respond(FreeMarkerContent("index.html", mapOf("data" to "Hello World!"), ""))
         }
-
         post("/api/{args}") {
             val args = call.parameters["args"]
             val received = call.receive<String>()

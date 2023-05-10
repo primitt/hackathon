@@ -25,6 +25,7 @@ repositories {
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-freemarker:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("com.apollographql.apollo3:apollo-runtime:3.8.1")
 
