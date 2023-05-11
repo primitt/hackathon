@@ -48,6 +48,11 @@ fun Application.configureRouting() {
         get("/signup") {
             call.respond(FreeMarkerContent("signup.ftl", mapOf("data" to "none"), ""))
         }
+        // TODO: Migrate [[GET/POST] Home.html, [GET/POST] login.html, [GET] recipe.html, [GET/POST] survey.html]
+        // TODO: Update Home.html [New header, fix search UI, replace flask w/ freemarker]
+        // TODO: Update index.html [Conditional Buttons (Login/Signup -> Home )]
+        // TODO: login.html [Fix/add messages, replace flask w/ freemarker]
+        // TODO: recipie.html [Fix header, update UI, Replace flask w/ freemarker]
         post("/signup") {
             val form = call.receiveParameters()
             transaction {
@@ -71,7 +76,7 @@ fun Application.configureRouting() {
                                 runBlocking {
                                     call.response.cookies.append(Cookie("session", genSessionId, maxAge = 2592000))
                                     call.response.cookies.append(Cookie("uuid", genUUID, maxAge = 2592000))
-                                    call.respondRedirect("/")
+                                    call.respondRedirect("/") // TODO: Add redirect to survey
                                 }
                             }
                             else{
