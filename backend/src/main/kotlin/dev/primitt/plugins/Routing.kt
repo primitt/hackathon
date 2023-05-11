@@ -8,8 +8,12 @@ import dev.primitt.*
 import dev.primitt.dto.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
+import io.ktor.server.engine.*
+import io.ktor.server.engine.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.http.*
+import io.ktor.serialization.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -26,13 +30,74 @@ import kotlin.collections.first
 import freemarker.cache.*
 import io.ktor.server.freemarker.*
 import kotlin.collections.firstOrNull
+import java.security.NoSuchAlgorithmException
+import java.math.BigInteger
+import java.security.MessageDigest
+import java.net.HttpCookie
 
 
 @OptIn(DelicateCoroutinesApi::class)
 fun Application.configureRouting() {
     routing {
         get("/") {
-            call.respond(FreeMarkerContent("index.html", mapOf("data" to "Hello World!"), ""))
+            call.respond(FreeMarkerContent("index.html", mapOf("data" to "none"), ""))
+        }
+        get("/login") {
+            call.respond(FreeMarkerContent("login.html", mapOf("data" to "none"), ""))
+        }
+        get("/signup") {
+            call.respond(FreeMarkerContent("signup.ftl", mapOf("data" to "none"), ""))
+        }
+        post("/signup") {
+            val form = call.receiveParameters()
+            transaction {
+                val users = Users.select(Users.name eq form["username"]!!)
+                if (form["password"] == form["rpassword"]) {
+                    if (form["username"]!!.length < 17){
+                        if (form["password"]!!.length > 7){
+                            if (users.count().toInt() == 0){
+                                var genUUID = UUID.randomUUID().toString()
+                                var genSessionId = UUID.randomUUID().toString()
+                                var hashedPsw: String = sha256(form["password"]!!).toString()
+                                    Users.insert{
+                                        it[name] = form["username"]!!
+                                        it[pass] = hashedPsw
+                                        it[uuid] = genUUID
+                                    }
+                                    Sessions.insert {
+                                        it[sessionId] = genSessionId
+                                        it[uuid] = genUUID
+                                    }
+                                runBlocking {
+                                    call.response.cookies.append(Cookie("session", genSessionId, maxAge = 2592000))
+                                    call.response.cookies.append(Cookie("uuid", genUUID, maxAge = 2592000))
+                                    call.respondRedirect("/")
+                                }
+                            }
+                            else{
+                                runBlocking{
+                                    call.respond(FreeMarkerContent("signup.ftl", mapOf("message" to "This username is already taken! Please chose a different one!"), ""))
+                                }
+                            }
+                        }
+                        else{
+                            runBlocking {
+                                call.respond(FreeMarkerContent("signup.ftl", mapOf("message" to "Your password has to be over 8 characters!"), ""))
+                            }
+                        }
+                    }
+                    else{
+                        runBlocking {
+                            call.respond(FreeMarkerContent("signup.ftl", mapOf("message" to "Your username is too long man, it has to be less than 16 characters!"), ""))
+                        }
+                    }
+                }
+                else{
+                    runBlocking{
+                        call.respond(FreeMarkerContent("signup.ftl", mapOf("message" to "Your password dont seem to match, please fix that! :3"), ""))
+                    }
+                }
+            }
         }
         post("/api/{args}") {
             val args = call.parameters["args"]

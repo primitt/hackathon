@@ -32,7 +32,6 @@ fun Application.module() {
     transaction {
         SchemaUtils.create(Users, Sessions)
     }
-
     runBlocking {
         println(queryLaunchList().data)
     }

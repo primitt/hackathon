@@ -9,9 +9,17 @@
     <header>
     </header>
     <body>
-        {{message}}
         <!-- make box in the middle of the screen -->
         <div class="flex flex-col items-center justify-center h-screen">
+            <#if message??>
+            <div class="alert shadow-lg alert-error" style="width:500px; margin-bottom:100px;">
+                <div>
+                    <span>
+                            ${message}
+                    </span>
+                </div>
+            </div>
+            </#if>
             <!-- make box with rounded corners -->
             <div class="w-96 p-6 space-y-6 bg-violet-950 rounded-xl shadow-md">
                 <!-- make box with rounded corners -->
