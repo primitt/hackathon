@@ -1,4 +1,4 @@
-/*
+
 package dev.primitt
 
 import com.cjcrafter.openai.OpenAI
@@ -31,7 +31,7 @@ val request = ChatRequest.builder()
 
 // Loads the API key from the .env file in the root directory.
 // You should never put your API keys in code, keep your key safe!
-val chatKey: String = "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"
+val chatKey: String = "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"
 val openai = OpenAI(chatKey)
 
 fun proompt(message: String) {
@@ -51,4 +51,4 @@ fun proompt(message: String) {
     // crucial to save this message, otherwise future requests will be
     // confused that there was no response.
     messages.add(response[0].message)
-}*/
+}
