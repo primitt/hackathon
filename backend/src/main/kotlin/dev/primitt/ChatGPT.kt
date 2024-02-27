@@ -28,10 +28,7 @@ val request = ChatRequest.builder()
 
 // Loads the API key from the .env file in the root directory.
 // You should never put your API keys in code, keep your key safe!
-
-// Loads the API key from the .env file in the root directory.
-// You should never put your API keys in code, keep your key safe!
-val chatKey: String = "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"
+val chatKey: String = ""
 val openai = OpenAI(chatKey)
 
 fun proompt(message: String) {
